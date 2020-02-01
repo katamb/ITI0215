@@ -52,9 +52,9 @@ public class HttpExchangeDataExtractor {
         }
     }
 
-    public static InetAddress getClientUrl(HttpExchange exchange) {
+    public static String getClientUrl(HttpExchange exchange) {
         return exchange.getRemoteAddress() != null
-                ? exchange.getRemoteAddress().getAddress()
+                ? exchange.getRemoteAddress().getAddress().toString() + ":" + exchange.getRemoteAddress().getPort()
                 : null;
     }
 }

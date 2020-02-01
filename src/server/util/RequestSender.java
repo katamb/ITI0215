@@ -4,8 +4,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,30 +28,19 @@ public class RequestSender {
         return null;
     }
 
-    //todo
-    private void sendPost() throws Exception {
+    public static HttpResponse<String> sendPost(String uri, String content) {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .POST(HttpRequest.BodyPublishers.ofString(content))
+                    .uri(URI.create(uri))
+                    .header("Content-Type", "application/json")
+                    .build();
 
-        // form parameters todo
-        Map<Object, Object> data = new HashMap<>();
-        data.put("username", "abc");
-        data.put("password", "123");
-        data.put("custom", "secret");
-        data.put("ts", System.currentTimeMillis());
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .POST(HttpRequest.BodyPublishers.ofString("ds"))
-                .uri(URI.create("https://httpbin.org/post"))
-                .setHeader("User-Agent", "Java 11 HttpClient Bot") // add request header
-                .header("Content-Type", "application/x-www-form-urlencoded")
-                .build();
-
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-        // print status code
-        System.out.println(response.statusCode());
-
-        // print response body
-        System.out.println(response.body());
-
+            return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (Exception e) {
+            logger.log(Level.INFO, e.getMessage());
+        }
+        return null;
     }
+
 }

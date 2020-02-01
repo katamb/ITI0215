@@ -24,6 +24,7 @@ import static server.util.General.getRandomDouble;
 import static server.util.HttpExchangeDataExtractor.getClientUrl;
 import static server.util.HttpExchangeDataExtractor.queryToMap;
 import static server.util.RequestSender.sendGet;
+import static server.util.RequestSender.sendPost;
 import static server.util.ResponseProvider.badRequestResponse;
 
 public class DownloadRequestHandler {
@@ -38,15 +39,24 @@ public class DownloadRequestHandler {
             badRequestResponse(exchange, "Error: Query parameters not correct!");
             return;
         }
+        RoutingInfo existingRoutingInfo = ROUTINGS_MADE.stream()
+                .filter(routing -> routing.getId().equals(id))
+                .findAny()
+                .orElse(null);
+        if (existingRoutingInfo != null) {
+            logger.log(Level.INFO, "This node has already forwarded this request!");
+            return;
+        }
 
         url = URLDecoder.decode(url, DEFAULT_ENCODING);
         RequestsInfo request = new RequestsInfo(id, url, LocalDate.now());
         REQUESTS.add(request);
-        RoutingInfo routingInfo = new RoutingInfo(id, getClientUrl(exchange).toString(), null);
+        RoutingInfo routingInfo = new RoutingInfo(id, getClientUrl(exchange), null);
+        ROUTINGS_MADE.add(routingInfo);
 
-        if (true){//getRandomDouble() > LAZYNESS) {
+        if (getRandomDouble() > LAZYNESS) {
             logger.log(Level.INFO, "Downloading file for request id " + id);
-            downloadFileAndSendItBack(request, routingInfo);//todo
+            downloadFileAndSendItBack(request, routingInfo);
         } else {
             logger.log(Level.INFO, "Forwarding request with id " + id);
             forwardMessage(request, routingInfo);
@@ -55,11 +65,29 @@ public class DownloadRequestHandler {
 
     private static void downloadFileAndSendItBack(RequestsInfo request, RoutingInfo routingInfo) {
         HttpResponse<String> response = sendGet(request.getUrl());
-        String encodedBody = Base64.getEncoder().encodeToString(response.body().getBytes());
-        String contentType = response.headers().map().get("content-type").get(0);
         int responseCode = response.statusCode();
-        System.out.println("");
+        String responseJson = getResponseJson(response, responseCode);
+        RoutingInfo routingInfo1 = ROUTINGS_MADE.stream()
+                .filter(routing -> routing.getId().equals(request.getId()))
+                .findAny()
+                .orElse(null);
+        sendPost(routingInfo1.getDownloadIp(), responseJson);
+    }
 
+    private static String getResponseJson(HttpResponse<String> response, int responseCode) {
+        if (responseCode != 200) {
+            return "{" +
+                   "\"status\": " + Integer.toString(responseCode) +
+                   " }";
+        } else {
+            String encodedBody = Base64.getEncoder().encodeToString(response.body().getBytes());
+            String contentType = response.headers().map().get("content-type").get(0);
+            return "{" +
+                   "\"status\": " + Integer.toString(responseCode) +
+                   "\"mime-type\": " + contentType +
+                   "\"content\": " + encodedBody +
+                   " }";
+        }
     }
 
     private static void forwardMessage(RequestsInfo request, RoutingInfo routingInfo) {

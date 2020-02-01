@@ -25,7 +25,7 @@ public class Server {
     public static List<ServersInfo> AVAILABLE_SERVERS = new LinkedList<>();  // TODO: kataloogiserver
     public static List<RoutingInfo> ROUTINGS_MADE = new LinkedList<>();
     public static List<RequestsInfo> REQUESTS = new LinkedList<>();
-    public static final double LAZYNESS = 0.75;
+    public static final double LAZYNESS = 0.5;
     private static final int DEFAULT_PORT = 1215;
 
     public static void main(String[] args) {
