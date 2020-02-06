@@ -1,6 +1,7 @@
 package server.util;
 
 import com.sun.net.httpserver.HttpExchange;
+import server.exception.BadRequestException;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -13,11 +14,20 @@ import static server.Server.DEFAULT_ENCODING;
 
 public class HttpExchangeDataExtractor {
 
+    private HttpExchangeDataExtractor() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static Map<String, String> queryToMap(HttpExchange exchange) {
         // https://stackoverflow.com/questions/11640025/how-to-obtain-the-query-string-in-a-get-with-java-httpserver-httpexchange
         String rawQuery = exchange.getRequestURI().getRawQuery();
         Map<String, String> result = new HashMap<>();
-        if (rawQuery == null || !rawQuery.contains("&")) {
+        if (rawQuery == null) {
+            return result;
+        }
+        if (!rawQuery.contains("&")) {
+            String[] entry = rawQuery.split("=");
+            result.put(decode(entry[0]), decode(entry[1]));
             return result;
         }
 
@@ -32,11 +42,11 @@ public class HttpExchangeDataExtractor {
         return result;
     }
 
-    private static String decode(String query) {
+    public static String decode(String query) {
         try {
             return URLDecoder.decode(query, DEFAULT_ENCODING);
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new BadRequestException(e.getMessage());
         }
     }
 
@@ -47,13 +57,11 @@ public class HttpExchangeDataExtractor {
         ) {
             return br.lines().collect(Collectors.joining(" "));
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new BadRequestException(e.getMessage());
         }
     }
 
     public static String getClientUrl(HttpExchange exchange) {
-        return exchange.getRemoteAddress() != null
-                ? exchange.getRemoteAddress().getAddress().toString() + ":" + exchange.getRemoteAddress().getPort()
-                : null;
+        return exchange.getRequestHeaders().getFirst("Sender-Ip");
     }
 }

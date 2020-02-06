@@ -2,7 +2,6 @@ package server.dto;
 
 import java.time.LocalDate;
 
-// Not currently in use, TODO: if start using, remove the comment
 public class RequestsInfo {
 
     public RequestsInfo(String id, String url, LocalDate timestamp) {

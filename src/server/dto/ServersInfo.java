@@ -36,4 +36,7 @@ public class ServersInfo {
         this.alive = alive;
     }
 
+    public String getIpWithPort() {
+        return ip + ":" + port;
+    }
 }

@@ -10,6 +10,10 @@ import java.util.logging.Logger;
 
 public class ResponseProvider {
 
+    private ResponseProvider() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static void successResponse(HttpExchange exchange, String message) throws IOException {
         exchange.sendResponseHeaders(200, message.getBytes().length);
         OutputStream os = exchange.getResponseBody();
