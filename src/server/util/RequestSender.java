@@ -15,7 +15,7 @@ public class RequestSender {
 
     private static final Logger logger = Logger.getLogger(RequestSender.class.getName());
     private static final HttpClient httpClient = HttpClient.newBuilder()
-            .version(HttpClient.Version.HTTP_2)
+            .version(HttpClient.Version.HTTP_1_1)
             .build();
 
     public static void sendAsyncGet(String uri, String senderIp) {

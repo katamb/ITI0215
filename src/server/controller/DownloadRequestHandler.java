@@ -76,7 +76,7 @@ public class DownloadRequestHandler {
 
         // Check if this request has been already forwarded
         if (getRoutingFromId(id) != null || getRequestFromId(id) != null) {
-            String message = "This node has already forwarded this request!";
+            String message = "Error: This node has already forwarded this request!";
             badRequestResponse(exchange, message);
             throw new BadRequestException(message);
         }
@@ -100,7 +100,7 @@ public class DownloadRequestHandler {
             return;
         }
 
-        String uri = existingRoutingInfo.getDownloadIp() + "/file?id=" + id;
+        String uri = "http://" + existingRoutingInfo.getDownloadIp() + "/file?id=" + id;
         logger.info(uri);
         sendPost(uri, responseJson);
     }
@@ -114,9 +114,9 @@ public class DownloadRequestHandler {
             String encodedBody = Base64.getEncoder().encodeToString(response.body().getBytes());
             String contentType = response.headers().map().get("content-type").get(0);
             return "{" +
-                   "\"status\": " + Integer.toString(responseCode) +
-                   "\"mime-type\": " + contentType +
-                   "\"content\": " + encodedBody +
+                   "\"status\": " + Integer.toString(responseCode) + "," +
+                   "\"mime-type\": " + contentType + "," +
+                   "\"content\": " + encodedBody + "," +
                    " }";
         }
     }

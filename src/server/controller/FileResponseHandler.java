@@ -2,16 +2,19 @@ package server.controller;
 
 import com.sun.net.httpserver.HttpExchange;
 import server.dto.RoutingInfo;
+import server.exception.BadRequestException;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static server.util.General.getMyIp;
 import static server.util.General.getRoutingFromId;
 import static server.util.HttpExchangeDataExtractor.*;
 import static server.util.RequestSender.sendPost;
 import static server.util.ResponseProvider.badRequestResponse;
+import static server.util.ResponseProvider.successResponse;
 
 
 public class FileResponseHandler {
@@ -23,20 +26,27 @@ public class FileResponseHandler {
         String id = queryParams.get("id");
         String content = getRequestBody(exchange);
         if (id == null) {
-            badRequestResponse(exchange, "Error: Query parameters not correct!");
-            return;
+            String message = "Error: Query parameters not correct!";
+            badRequestResponse(exchange, message);
+            throw new BadRequestException(message);
         }
 
         RoutingInfo existingRoutingInfo = getRoutingFromId(id);
         if (existingRoutingInfo == null) {
-            logger.log(Level.WARNING, "No info where to send the response!");  // Should never get here
-            badRequestResponse(exchange, "Error: No info where to send the response!");
-            return;
+            String message = "Error: Query parameters not correct!";
+            badRequestResponse(exchange, message);
+            throw new BadRequestException(message);
         }
         existingRoutingInfo.setFileIp(getClientUrl(exchange));
 
-        // ToDo: What if my ip is the download ip?!
-        String uri = existingRoutingInfo.getDownloadIp() + "/file?id=" + id;
+        // My ip is download ip
+        if (existingRoutingInfo.getDownloadIp().equals(getMyIp(exchange))) {
+            logger.info("Got the requested file (with id " + id + ") and content: " + content);
+            successResponse(exchange, "OK");
+            return;
+        }
+
+        String uri = "http://" + existingRoutingInfo.getDownloadIp() + "/file?id=" + id;
         sendPost(uri, content);
     }
 
