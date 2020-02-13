@@ -6,12 +6,14 @@ import com.sun.net.httpserver.HttpServer;
 import server.dto.RequestsInfo;
 import server.dto.RoutingInfo;
 import server.dto.ServersInfo;
+import server.util.TaskRunner;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Timer;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -45,6 +47,7 @@ public class Server {
             context.setHandler(Server::handleRequest);
             server.start();
             logger.log(Level.INFO, String.format("Server started on port: %d", PORT));
+            runScheduledTasks();
         } catch (IOException ioe) {
             logger.log(Level.SEVERE, ioe.getMessage());
         }
@@ -74,4 +77,10 @@ public class Server {
         }
     }
 
+    private static void runScheduledTasks() {
+        Timer t = new Timer();
+        TaskRunner mTask = new TaskRunner();
+        // This task is scheduled to run every 60 seconds
+        t.scheduleAtFixedRate(mTask, 0, 60000);
+    }
 }

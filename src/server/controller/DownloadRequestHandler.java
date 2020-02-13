@@ -5,6 +5,7 @@ import server.dto.RequestsInfo;
 import server.dto.RoutingInfo;
 import server.dto.ServersInfo;
 import server.exception.BadRequestException;
+import server.util.ResponseProvider;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -87,12 +88,16 @@ public class DownloadRequestHandler {
         HttpResponse<String> response = sendGet(url, getMyIp(exchange));
         if (response == null) {
             logger.log(Level.WARNING, "Unable to query given URL!");
-            badRequestResponse(exchange, "Error: Unable to query given URL!");
+            String responseJson = createResponseJson(response, 404);
+            returnInfoAboutRequest(exchange, id, responseJson);
             return;
         }
 
-        int responseCode = response.statusCode();
-        String responseJson = createResponseJson(response, responseCode);
+        String responseJson = createResponseJson(response, response.statusCode());
+        returnInfoAboutRequest(exchange, id, responseJson);
+    }
+
+    private static void returnInfoAboutRequest(HttpExchange exchange, String id, String responseJson) throws IOException {
         RoutingInfo existingRoutingInfo = getRoutingFromId(id);
         if (existingRoutingInfo == null) {
             logger.log(Level.WARNING, "No info where to send the response!");  // Should never get here
