@@ -27,7 +27,7 @@ public class Server {
 
     private static final Logger logger = Logger.getLogger(Server.class.getName());
     public static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
-    public static final List<ServersInfo> AVAILABLE_SERVERS = new LinkedList<>();
+    public static List<ServersInfo> availableServers = new LinkedList<>();
     public static final List<RoutingInfo> ROUTINGS_MADE = new LinkedList<>();
     public static final List<RequestsInfo> MY_REQUESTS = new LinkedList<>();
     public static final double LAZYNESS = 0.5;
@@ -35,10 +35,10 @@ public class Server {
 
     public static void main(String[] args) {
         // TODO: Need pead saama kuskilt kataloogiserverist?
-        AVAILABLE_SERVERS.add(new ServersInfo("127.0.0.1", "1215", true));
-        AVAILABLE_SERVERS.add(new ServersInfo("127.0.0.1", "1216", true));
-        AVAILABLE_SERVERS.add(new ServersInfo("127.0.0.1", "1217", true));
-        AVAILABLE_SERVERS.add(new ServersInfo("127.0.0.1", "1218", true));
+//        AVAILABLE_SERVERS.add(new ServersInfo("127.0.0.1", "1215", true));
+//        AVAILABLE_SERVERS.add(new ServersInfo("127.0.0.1", "1216", true));
+//        AVAILABLE_SERVERS.add(new ServersInfo("127.0.0.1", "1217", true));
+//        AVAILABLE_SERVERS.add(new ServersInfo("127.0.0.1", "1218", true));
 
         try {
             injectPortValue(args);
@@ -82,5 +82,13 @@ public class Server {
         TaskRunner mTask = new TaskRunner();
         // This task is scheduled to run every 60 seconds
         t.scheduleAtFixedRate(mTask, 0, 60000);
+    }
+
+    public static void setAvailableServers(List<ServersInfo> availableServers1) {
+        availableServers = availableServers1;
+    }
+
+    public static List<ServersInfo> getAvailableServers() {
+        return availableServers;
     }
 }

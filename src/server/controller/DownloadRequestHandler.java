@@ -1,6 +1,7 @@
 package server.controller;
 
 import com.sun.net.httpserver.HttpExchange;
+import server.Server;
 import server.dto.RequestsInfo;
 import server.dto.RoutingInfo;
 import server.dto.ServersInfo;
@@ -127,7 +128,7 @@ public class DownloadRequestHandler {
     }
 
     private static void forwardMessage(String id, String url, String currentServerIp) {
-        for (ServersInfo server : AVAILABLE_SERVERS) {
+        for (ServersInfo server : Server.getAvailableServers()) {
             // Don't send to myself, would result in deadlock
             if (server.isAlive() && (server.getIp() + ":" + server.getPort()).equals(currentServerIp)) {
                 continue;
