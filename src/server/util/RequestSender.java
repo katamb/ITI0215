@@ -2,38 +2,34 @@ package server.util;
 
 import server.Server;
 
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class RequestSender {
-
-    private RequestSender() {
-        throw new IllegalStateException("Utility class");
-    }
 
     private static final Logger logger = Logger.getLogger(RequestSender.class.getName());
     private static final HttpClient httpClient = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_1_1)
             .build();
 
-    public static void sendAsyncGet(String uri, String senderIp) {
-        try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .GET()
-                    .uri(URI.create(uri))
-                    .header("Sender-Ip", senderIp)
-                    .build();
+    private RequestSender() {
+        throw new IllegalStateException("Utility class");
+    }
 
-            HttpResponse t = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).get();
-        } catch (Exception e) {
-            String serverIp = uri.split("//")[1].split("/")[0];
-            logger.log(Level.WARNING, "Server " + serverIp + " is unavailable.");
-            Server.removeServerByIp(serverIp);
-        }
+    public static void sendAsyncGet(String uri, String senderIp) throws ConnectException, InterruptedException, ExecutionException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create(uri))
+                .header("Sender-Ip", senderIp)
+                .build();
+
+        HttpResponse t = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).get();
     }
 
     public static HttpResponse<String> sendGet(String uri, String senderIp) {

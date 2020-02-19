@@ -30,7 +30,7 @@ public class TaskRunner extends TimerTask {
             .build();
 
     public TaskRunner() {
-        //Some stuffs
+        logger.info("Updating available server list.");
     }
 
     @Override

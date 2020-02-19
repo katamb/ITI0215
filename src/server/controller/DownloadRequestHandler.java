@@ -9,12 +9,11 @@ import server.exception.BadRequestException;
 import server.util.ResponseProvider;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.URLEncoder;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
-import java.util.Base64;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -128,6 +127,7 @@ public class DownloadRequestHandler {
     }
 
     private static void forwardMessage(String id, String url, String currentServerIp, String requestSenderIp) {
+        List<String> offlineServers = new ArrayList<>();
         for (ServersInfo server : Server.getAvailableServers()) {
             // Don't send to myself, would result in deadlock
             if (server.isAlive() && (server.getIp() + ":" + server.getPort()).equals(currentServerIp)) {
@@ -140,8 +140,15 @@ public class DownloadRequestHandler {
             String uri = "http://" + server.getIpWithPort()
                     + "/download?id=" + id
                     + "&url=" + encode(url);
-            sendAsyncGet(uri, currentServerIp);
+            try {
+                sendAsyncGet(uri, currentServerIp);
+            } catch (Exception e) {
+                String serverIp = uri.split("//")[1].split("/")[0];
+                logger.log(Level.WARNING, "Server " + serverIp + " is unavailable.");
+                offlineServers.add(serverIp);
+            }
         }
+        removeServersByIp(offlineServers);
     }
 
     private static String encode(String query) {

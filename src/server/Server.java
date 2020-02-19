@@ -17,6 +17,7 @@ import java.util.Objects;
 import java.util.Timer;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import static server.controller.DownloadRequestHandler.handleDownloadRequest;
 import static server.controller.DownloadRequestHandler.startDownloadRequest;
@@ -33,6 +34,10 @@ public class Server {
     public static final List<RequestsInfo> MY_REQUESTS = new LinkedList<>();
     public static final double LAZYNESS = 0.5;
     private static int PORT = 1215;
+
+    static {
+        System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
+    }
 
     public static void main(String[] args) {
         // TODO: Need pead saama kuskilt kataloogiserverist?
@@ -93,8 +98,12 @@ public class Server {
         return availableServers;
     }
 
-    public static void removeServerByIp(String ip) {
-        ServersInfo s = availableServers.stream().filter(serversInfo -> Objects.equals(serversInfo.getIpWithPort(), ip)).findFirst().orElse(null);
-        availableServers.remove(s);
+    public static void removeServersByIp(List<String> offlineServers) {
+        for (String ip: offlineServers) {
+            ServersInfo s = availableServers.stream().filter(serversInfo -> Objects.equals(serversInfo.getIpWithPort(), ip)).findFirst().orElse(null);
+            availableServers.remove(s);
+        }
+        String serversAsString = availableServers.stream().map(ServersInfo::getIpWithPort).collect(Collectors.joining(", "));
+        logger.log(Level.INFO, String.format("Available servers: %s", serversAsString));
     }
 }
