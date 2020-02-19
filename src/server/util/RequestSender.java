@@ -1,5 +1,7 @@
 package server.util;
 
+import server.Server;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -26,9 +28,11 @@ public class RequestSender {
                     .header("Sender-Ip", senderIp)
                     .build();
 
-            httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse t = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).get();
         } catch (Exception e) {
-            logger.log(Level.INFO, e.getMessage());
+            String serverIp = uri.split("//")[1].split("/")[0];
+            logger.log(Level.WARNING, "Server " + serverIp + " is unavailable.");
+            Server.removeServerByIp(serverIp);
         }
     }
 

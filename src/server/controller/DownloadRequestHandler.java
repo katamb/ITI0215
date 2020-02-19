@@ -45,7 +45,7 @@ public class DownloadRequestHandler {
         ROUTINGS_MADE.add(routingInfo);
 
         logger.log(Level.INFO, String.format("Created a request with id %s and asking for url %s.", uuid, url));
-        forwardMessage(uuid, url, serverIp);
+        forwardMessage(uuid, url, serverIp, "this is initial request, no need to check sender-ip");
     }
 
     public static void handleDownloadRequest(HttpExchange exchange) throws IOException {
@@ -65,7 +65,7 @@ public class DownloadRequestHandler {
             downloadFileAndSendItBack(exchange, id, url);
         } else {
             logger.log(Level.INFO, String.format("Forwarding request with id %s", id));
-            forwardMessage(id, url, serverIp);
+            forwardMessage(id, url, serverIp, getClientUrl(exchange));
         }
     }
 
@@ -127,10 +127,14 @@ public class DownloadRequestHandler {
         }
     }
 
-    private static void forwardMessage(String id, String url, String currentServerIp) {
+    private static void forwardMessage(String id, String url, String currentServerIp, String requestSenderIp) {
         for (ServersInfo server : Server.getAvailableServers()) {
             // Don't send to myself, would result in deadlock
             if (server.isAlive() && (server.getIp() + ":" + server.getPort()).equals(currentServerIp)) {
+                continue;
+            }
+            // Don't send to server from which the request came from.
+            if (requestSenderIp.equals(server.getIpWithPort())) {
                 continue;
             }
             String uri = "http://" + server.getIpWithPort()

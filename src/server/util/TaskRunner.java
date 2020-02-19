@@ -4,7 +4,6 @@ import server.Server;
 import server.dto.ServersInfo;
 
 import java.io.*;
-import java.net.ConnectException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;

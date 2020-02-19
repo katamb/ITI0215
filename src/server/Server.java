@@ -13,6 +13,7 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -66,8 +67,8 @@ public class Server {
             successResponse(exchange, "OK: Invoked server started download request.");
         } else if (exchange.getRequestMethod().equals("GET") && exchange.getRequestURI().getPath().equals("/download")) {
             logger.log(Level.INFO, "Got download (GET) request");
-            handleDownloadRequest(exchange);
             successResponse(exchange, "OK");
+            handleDownloadRequest(exchange);
         } else if (exchange.getRequestMethod().equals("POST") && exchange.getRequestURI().getPath().equals("/file")) {
             logger.log(Level.INFO, "Got file (POST) request");
             handleFileResponse(exchange);
@@ -90,5 +91,10 @@ public class Server {
 
     public static List<ServersInfo> getAvailableServers() {
         return availableServers;
+    }
+
+    public static void removeServerByIp(String ip) {
+        ServersInfo s = availableServers.stream().filter(serversInfo -> Objects.equals(serversInfo.getIpWithPort(), ip)).findFirst().orElse(null);
+        availableServers.remove(s);
     }
 }
