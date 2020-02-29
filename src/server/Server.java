@@ -40,12 +40,6 @@ public class Server {
     }
 
     public static void main(String[] args) {
-        // TODO: Need pead saama kuskilt kataloogiserverist?
-//        AVAILABLE_SERVERS.add(new ServersInfo("127.0.0.1", "1215", true));
-//        AVAILABLE_SERVERS.add(new ServersInfo("127.0.0.1", "1216", true));
-//        AVAILABLE_SERVERS.add(new ServersInfo("127.0.0.1", "1217", true));
-//        AVAILABLE_SERVERS.add(new ServersInfo("127.0.0.1", "1218", true));
-
         try {
             injectPortValue(args);
             HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);

@@ -23,7 +23,7 @@ public class TaskRunner extends TimerTask {
 
     private static final Logger logger = Logger.getLogger(TaskRunner.class.getName());
 
-    String catalogServer = "http://dijkstra.cs.ttu.ee/~emil.fenenko/hajussys/available_servers";
+    private String catalogServer = "http://dijkstra.cs.ttu.ee/~emil.fenenko/hajussys/available_servers";
 
     private static final HttpClient httpClient = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_1_1)
@@ -49,8 +49,6 @@ public class TaskRunner extends TimerTask {
                 ex.printStackTrace();
             }
         }
-
-
     }
 
     private void updateServers(String response) throws IOException {
@@ -67,6 +65,10 @@ public class TaskRunner extends TimerTask {
     }
 
     private void writeToFile(String input) throws IOException {
+        File dir = new File("resources");
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
         File serverFile = new File("resources/servers.txt");
         Path path = Paths.get(serverFile.getAbsolutePath());
         serverFile.createNewFile();

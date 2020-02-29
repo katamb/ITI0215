@@ -6,10 +6,8 @@ import server.dto.RequestsInfo;
 import server.dto.RoutingInfo;
 import server.dto.ServersInfo;
 import server.exception.BadRequestException;
-import server.util.ResponseProvider;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.URLEncoder;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;

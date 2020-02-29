@@ -1,7 +1,5 @@
 package server.util;
 
-import server.Server;
-
 import java.net.ConnectException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -29,7 +27,7 @@ public class RequestSender {
                 .header("Sender-Ip", senderIp)
                 .build();
 
-        HttpResponse t = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).get();
+        httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).get();
     }
 
     public static HttpResponse<String> sendGet(String uri, String senderIp) {

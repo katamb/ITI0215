@@ -6,7 +6,6 @@ import server.exception.BadRequestException;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static server.util.General.getMyIp;
